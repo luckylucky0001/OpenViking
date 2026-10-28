@@ -1482,6 +1482,10 @@ class TestWatchTaskCancellation:
         task = await get_task_by_uri(resource_service, to_uri, request_context)
         assert task is not None
         assert task.is_active is True
+        await resource_service._watch_scheduler.watch_manager.update_source_checkpoint(
+            task.task_id,
+            {"kind": "git", "head_sha": "a" * 40, "instruction": ""},
+        )
 
         await resource_service.add_resource(
             path="/test/path",
@@ -1493,6 +1497,7 @@ class TestWatchTaskCancellation:
         task = await get_task_by_uri(resource_service, to_uri, request_context)
         assert task is not None
         assert task.is_active is False
+        assert task.source_checkpoint is None
 
     @pytest.mark.asyncio
     async def test_cancel_watch_task_with_negative_interval(

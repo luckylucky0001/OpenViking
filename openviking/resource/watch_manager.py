@@ -550,6 +550,7 @@ class WatchManager:
         auth_state: Any = _UNSET,
         connector_states: Any = _UNSET,
         is_active: Optional[bool] = None,
+        invalidate_source_checkpoint: bool = False,
     ) -> WatchTask:
         """Update a watch task while its current and requested target URIs are stable."""
         while True:
@@ -593,6 +594,7 @@ class WatchManager:
                         auth_state=auth_state,
                         connector_states=connector_states,
                         is_active=is_active,
+                        invalidate_source_checkpoint=invalidate_source_checkpoint,
                     )
 
     async def _update_task_unlocked(
@@ -616,6 +618,7 @@ class WatchManager:
         auth_state: Any,
         connector_states: Any,
         is_active: Optional[bool],
+        invalidate_source_checkpoint: bool,
     ) -> WatchTask:
         task_id = task.task_id
         if self._check_uri_conflict(
@@ -670,6 +673,8 @@ class WatchManager:
             task.connector_states = connector_states
         if is_active is not None:
             task.is_active = is_active
+        if invalidate_source_checkpoint:
+            task.source_checkpoint = None
 
         if watch_interval is not None:
             if task.is_active and task.watch_interval > 0:

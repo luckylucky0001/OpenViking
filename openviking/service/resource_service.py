@@ -2554,6 +2554,7 @@ class ResourceService:
                 user_id=ctx.user.user_id,
                 role=str(ctx.role),
                 is_active=False,
+                invalidate_source_checkpoint=True,
             )
             logger.info(
                 f"[ResourceService] Deactivated watch task {existing_task.task_id} for {to_uri}"
